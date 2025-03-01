@@ -14,7 +14,7 @@ function Navbar() {
   return (
     <>
       {/* Fixed Navbar */}
-      <nav className="fixed top-0 left-0 w-full h-18 bg-white shadow-sm z-20">
+      <nav className="fixed top-0 left-0 w-full h-19 bg-white shadow-xs z-20">
         <div className="container mx-auto flex justify-between items-center px-4 h-full">
           {/* Logo positioned left */}
           <Link to="/">
@@ -45,11 +45,16 @@ function Navbar() {
             </div>
 
             <div className="relative cursor-pointer">
-              <Link to="/addcart">
+              <Link to="/addcart" className="flex items-center space-x-2">
+              <div className="relative">
+
                 <ShoppingCart size={24} className="text-gray-700 dark:text-black" />
+        
                 <span className="absolute -top-3 -right-3 bg-emerald-500 text-white text-sm px-2 rounded-full">
                   0
                 </span>
+                </div>
+                <span>Cart</span>
               </Link>
             </div>
 
