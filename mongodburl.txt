@@ -1,0 +1,2 @@
+MONGODB_URI = "mongodb+srv://jayasurya:suryajsm@employeehub.1sv1y.mongodb.net/farm2bag-recommendation?retryWrites=true&w=majority"
+PORT = 5000
