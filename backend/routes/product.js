@@ -8,4 +8,4 @@ router.get("/search",  searchProduct);
 router.post("/products", getProductById);
 router.post("/",  createProduct);
 
-exports.default = router;
+module.exports = router;

@@ -4,5 +4,6 @@ const { trackEvent, removeEvent, getEvents } = require("../controllers/event");
 
 router.post("/", trackEvent);  
 router.delete("/", removeEvent);
-router.get("/", getEvents);    
+router.get("/", getEvents);  
+  
 module.exports = router;
