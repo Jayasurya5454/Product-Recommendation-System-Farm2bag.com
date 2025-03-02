@@ -12,7 +12,7 @@ app.use(cors());
 app.use('/api/product', require('./routes/product.js'));
 app.use('/api/event', require('./routes/event.js'));
 app.use('/api/order', require('./routes/order.js'));
-
+app.use('/api/unknownuser', require('./routes/unknownuser.js'));
 
 // Server listening
 const PORT = process.env.PORT || 5000;
