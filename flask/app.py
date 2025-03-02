@@ -6,7 +6,7 @@ import pickle
 from sklearn.metrics.pairwise import cosine_similarity
 from pymongo import MongoClient
 from bson import ObjectId  
-
+import requests
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -145,20 +145,37 @@ def recommend():
     print(f"User events DataFrame: {user_events}")
 
     if user_events.empty:
-        return jsonify({"message": f"No interactions found for user {user_id}", "recommendations": []})
+        try:
+            BASE_URL = os.getenv('BASE_URL')
+            response = requests.get(f"{BASE_URL}/unknownuser")
+            response.raise_for_status()  
+            data = response.json()
+            return {
+                "user_id": user_id,
+                "hybrid": data
+            }
+        except requests.exceptions.RequestException as e:
+            return {"error": str(e)}    
+        
 
     first_product_id = str(user_events["productId"].iloc[0])
     content_recs = content_based_recommendations(first_product_id)
     collaborative_recs = collaborative_filtering(user_id)
     hybrid_recs = hybrid_filtering(user_id)
+    
+    dataaa=content_recs + collaborative_recs + hybrid_recs
+    print(dataaa)
+    try:
+        BASE_URL = os.getenv('BASE_URL')
+        response = requests.post(f"{BASE_URL}/product/search", json={"user_id": user_id, "data": dataaa})
+        response.raise_for_status()  
+        ret_data = response.json()
+    except requests.exceptions.RequestException as e:
+        return {"error": str(e)}
 
-    return jsonify({
-        "user_id": user_id,
-        "content_based": content_recs,
-        "collaborative": collaborative_recs,
-        "hybrid": hybrid_recs
-    })
-
+    return jsonify({"user_id": user_id, 
+                    "data":ret_data})
 
 if __name__ == "__main__":
+    
     app.run(debug=True, port=5000)
