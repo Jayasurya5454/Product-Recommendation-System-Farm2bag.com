@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Homepage from "../src/pages/Home";
-import Favorites from "./pages/Favorites";
+import Favorites from "./pages/FavoritesPage";
 import SearchProducts from "./pages/Searchproduct";
-import Products from "./pages/Products";
+import Products from "./pages/ProductsPage";
 
 function App() {
   return (
