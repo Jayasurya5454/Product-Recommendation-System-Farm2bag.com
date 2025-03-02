@@ -7,6 +7,7 @@ import  pickle from "../assets/images_home/pickle.webp";
 import  podi from "../assets/images_home/podi.webp";
 import  rice from "../assets/images_home/rice.webp";
 import  tveg from "../assets/images_home/tveg.webp";
+import { Link } from "react-router-dom";
 
 
 const categories = [
@@ -31,7 +32,8 @@ const CategoryList = () => {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4 px-2">
   {categories.map((category) => (
     <div key={category.id} className="flex flex-col items-center">
-      <img
+  <Link to={`search/category/${category.id}`}>
+  <img
         src={category.image}
         alt={category.name}
         className="w-36 h-36 rounded-full shadow-md object-cover"
@@ -39,6 +41,7 @@ const CategoryList = () => {
       <p className="text-lg font-medium mt-2 w-28 text-center truncate">
         {category.name}
       </p>
+      </Link>
     </div>
   ))}
 </div>
