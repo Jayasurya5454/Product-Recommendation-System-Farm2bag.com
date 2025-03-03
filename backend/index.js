@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(cors());
 
 // Routes
-// app.use('/api/user', require('./routes/user'));
+app.use('/api/user', require('./routes/user.js'));
 app.use('/api/product', require('./routes/product.js'));
 app.use('/api/event', require('./routes/event.js'));
 app.use('/api/order', require('./routes/order.js'));

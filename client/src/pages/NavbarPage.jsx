@@ -1,21 +1,36 @@
-import React from "react";
-import { ShoppingCart, User, Search, Heart } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { ShoppingCart, Search, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import img from "../assets/Logo_with_text.webp";
+import SignIn from "../components/Signin";
+import { auth } from "../../../firebase.js";
+import { signOut } from "firebase/auth";
+
 
 function Navbar() {
-  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+  const handleLogout =async () => {
+     await signOut(auth);
+    setUser(null);
+     navigate("/");
   };
+  
+  
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   return (
     <>
       {/* Fixed Navbar */}
       <nav className="fixed top-0 left-0 w-full h-20 bg-white shadow-xs z-20">
-        <div className="container mx-auto flex justify-between items-center px-4 h-full">
+        <div className="container mx-auto flex justify-around items-center px-4 h-full">
           {/* Logo positioned left */}
           <Link to="/">
             <div className="flex items-center cursor-pointer">
@@ -37,16 +52,16 @@ function Navbar() {
           </div>
 
           {/* Icons & Buttons */}
-          <div className="flex items-center space-x-10">
-            <div className="relative cursor-pointer">
+          <div className="flex items-center space-x-6">
+            <div className="relative cursor-pointer items-start ">
               <Link to="/favorites">
                 <Heart size={24} className="text-gray-700 dark:text-black" />
               </Link>
             </div>
 
-            <div className="relative cursor-pointer">
-              <Link to="/addcart" className="flex items-center space-x-2">
-              <div className="relative">
+            <div className="relative cursor-pointer ">
+              <Link to="/addcart" className="flex items-end  space-x-2">
+              <div className="relative ">
 
                 <ShoppingCart size={24} className="text-gray-700 dark:text-black" />
         
@@ -58,13 +73,20 @@ function Navbar() {
               </Link>
             </div>
 
-            <div
-              onClick={handleLogout}
-              className="flex items-center space-x-3 px-4 py-2 transition-all duration-300 cursor-pointer"
+            {/* <div
+              
+              className="flex items-center cursor-pointer"
             >
-              <User size={24} />
-              <span>Sign In</span>
-            </div>
+              
+              <SignIn/>
+            </div> */}
+              {user ? (
+            <button onClick={handleLogout} className=" cursor-pointer px-4 py-2 text-white bg-red-400 rounded-md hover:bg-red-600 transition-colors duration-300 flex items-center gap-2">
+              Logout
+            </button>
+          ) : (
+            <SignIn />
+          )}
           </div>
         </div>
       </nav>
