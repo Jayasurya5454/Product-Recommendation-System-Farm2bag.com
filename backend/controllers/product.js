@@ -1,12 +1,18 @@
 const Product = require("../models/product.js");
 const Event = require("../models/event.js");
+const AllProduct = require("../models/allProducts.js");
 const createProduct = async (req, res) => {
     try {
-        const { title, description, price, photos } = req.body;
+        const { title, description, price, photos,quantity } = req.body;
         
-        const product = new Product({ title, description, price, photos });
-
+        const product = new Product({ title, description, price, photos , quantity });
+        
         await product.save();
+
+        // create a same da in all product also
+        const allProduct = new AllProduct({ productId: product._id, weights: 0 });
+        await allProduct.save();
+
         res.status(201).json({ message: "Product created successfully", product });
     } catch (error) {
         res.status(400).json({ message: error.message });

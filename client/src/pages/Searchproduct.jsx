@@ -13,7 +13,7 @@ import tveg from "../assets/images_home/tveg.webp";
 
 import spi1 from "../assets/products/sirukeerai.webp";
 import spi2 from "../assets/products/mulaikeerai.webp";
-import spi3 from "../assets/products/thandukeerai.webp";
+import spi3 from "../assets/products/Thandukeerai.webp";
 import brinjal from "../assets/products/brinjal.webp";
 import toor from "../assets/products/thoordal.webp";
 import oran from "../assets/products/ORANGE.webp";
