@@ -3,7 +3,7 @@ const Product = require('../models/product.js');
 
 const getAllProducts = async (req, res) => {
     try {
-        const allProducts = await AllProducts.find().sort({ weight: -1 });
+        const allProducts = await AllProducts.find().sort({ weights: -1 });
 
         const detailedProducts = await Promise.all(
             allProducts.map(async (product) => {
