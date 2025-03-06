@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ShoppingCart, Search, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import img from "../assets/Logo_with_text.webp";
-import { auth } from "../../../firebase.js";
+import { auth } from "../../firebase.js";
 import { signOut } from "firebase/auth";
 import SignInWithGoogle from "../components/SignInWithGoogle.jsx";
 

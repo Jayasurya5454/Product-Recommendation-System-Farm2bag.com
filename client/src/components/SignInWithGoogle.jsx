@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { User } from "lucide-react";
 import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../../firebase.js";
+import { auth } from "../../firebase.js";
 import logimg from "../assets/signup-banner.webp";
 import log2img from "../assets/signin-banner.webp";
 
