@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { ShoppingCart, Search, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import img from "../assets/Logo_with_text.webp";
-import SignIn from "../components/Signin";
 import { auth } from "../../../firebase.js";
 import { signOut } from "firebase/auth";
+import SignInWithGoogle from "../components/SignInWithGoogle.jsx";
 
 
 function Navbar() {
@@ -13,8 +13,12 @@ function Navbar() {
 
   const handleLogout =async () => {
      await signOut(auth);
-    setUser(null);
+     const confirmLogout = window.confirm("Are you sure you want to log out?");
+      if (confirmLogout) {
+     setUser(null);
      navigate("/");
+     console.log("User logged out"); 
+    }
   };
   
   
@@ -85,7 +89,7 @@ function Navbar() {
               Logout
             </button>
           ) : (
-            <SignIn />
+            <SignInWithGoogle />
           )}
           </div>
         </div>
