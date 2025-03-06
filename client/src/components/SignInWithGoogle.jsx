@@ -58,10 +58,7 @@ const SignInWithGoogle = () => {
     }
   };
 
-  const initiateLogout = () => {
-    setLogoutConfirmOpen(true);
-  };
-
+  
   const closeSignInModal = () => {
     setModalVisible(false);
     setTimeout(() => setIsOpen(false), 300);
@@ -73,7 +70,6 @@ const SignInWithGoogle = () => {
         <div className="flex items-center gap-4">
           <p>Welcome, {user.email}</p>
           <button
-            onClick={initiateLogout}
             className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-600 transition"
           >
             Logout

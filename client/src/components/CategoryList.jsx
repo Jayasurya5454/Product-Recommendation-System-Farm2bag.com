@@ -22,6 +22,7 @@ const categories = [
 ];
 
 const CategoryList = () => {
+ 
   return (
     <div className=" mt-4  mx-auto text-center py-10">
       <h2 className="text-2xl font-semibold">Category List</h2>
@@ -38,7 +39,7 @@ const CategoryList = () => {
         alt={category.name}
         className="w-36 h-36 rounded-full shadow-md object-cover"
       />
-      <p className="text-lg font-medium mt-2 w-28 text-center truncate">
+      <p className="text-sm font-medium mt-2 w-30 text-center truncate">
         {category.name}
       </p>
       </Link>

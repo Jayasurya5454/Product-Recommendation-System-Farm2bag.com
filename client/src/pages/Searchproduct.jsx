@@ -17,6 +17,7 @@ import spi3 from "../assets/products/Thandukeerai.webp";
 import brinjal from "../assets/products/brinjal.webp";
 import toor from "../assets/products/thoordal.webp";
 import oran from "../assets/products/ORANGE.webp";
+import ProductDetails from "../components/ProductDetails"; // Import the ProductDetails component
 
 const categories = [
   { id: 1, name: "Spinach Leaf Varieties", image: Spinach },
@@ -44,6 +45,8 @@ const Searchproduct = () => {
   const [activeCategory, setActiveCategory] = useState(categoryId || null);
   const [quantities, setQuantities] = useState({});
   const [favorites, setFavorites] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const filteredProducts = products.filter((product) => product.category === categoryId);
   const categoryName = categories.find((cat) => cat.id === categoryId)?.name || "Products";
@@ -67,29 +70,60 @@ const Searchproduct = () => {
     });
   };
 
-  const toggleCounter = (productId) => {
+  const toggleCounter = (productId, event) => {
+    // Stop event propagation to prevent opening detail modal when clicking the + button
+    event.stopPropagation();
+    
     setQuantities((prev) => ({
       ...prev,
       [productId]: prev[productId] ? undefined : 1, 
     }));
   };
 
-  const toggleFavorite = (product) => {
+  const toggleFavorite = (product, event) => {
+    // Stop event propagation to prevent opening detail modal when clicking the heart
+    event.stopPropagation();
+    
     setFavorites((prev) => {
       const exists = prev.find((item) => item.id === product.id);
       return exists ? prev.filter((item) => item.id !== product.id) : [...prev, product];
     });
   };
 
+  const openProductDetails = (product) => {
+    setSelectedProduct(product);
+    setIsDetailsOpen(true);
+  };
+
+  const closeProductDetails = () => {
+    setIsDetailsOpen(false);
+  };
+
+  const addToCart = () => {
+    if (selectedProduct) {
+      // Set default quantity if not already set
+      if (!quantities[selectedProduct.id]) {
+        setQuantities((prev) => ({
+          ...prev,
+          [selectedProduct.id]: 1,
+        }));
+      }
+      
+      // Here you would add the item to the cart
+      console.log(`Added ${selectedProduct.name} to cart with quantity ${quantities[selectedProduct.id] || 1}`);
+      
+      // Optionally close the modal after adding to cart
+      // closeProductDetails();
+    }
+  };
+
   return (
     <div className="relative">
-     
       <div className="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
         <Navbar />
       </div>
 
       <div className="flex pt-16 mt-16">
-      
         <div className="w-1/4 p-4 h-screen">
           <div className="mb-4">
             <Link to="/" className="flex items-center text-gray-900">
@@ -97,7 +131,6 @@ const Searchproduct = () => {
             </Link>
           </div>
 
-          
           <h2 className="text-xl font-semibold mb-6">Categories</h2>
           <ul className="max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
             {categories.map((cat) => (
@@ -117,60 +150,71 @@ const Searchproduct = () => {
           </ul>
         </div>
 
-       
         <div className="w-3/4 p-4">
           <h2 className="text-md text-gray-500 mb-6">Showing results for: {categoryName}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 cursor-pointer">
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
-                <div key={product.id} className="border p-6 rounded-lg shadow bg-white relative group">
+                <div 
+                  key={product.id} 
+                  className="border p-6 rounded-lg shadow bg-white relative group"
+                  onClick={() => openProductDetails(product)}
+                >
                   <div className="relative overflow-hidden rounded-lg">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-40 object-cover rounded-lg transition-transform group-hover:scale-110 "
+                      className="w-full h-40 object-cover rounded-lg transition-transform group-hover:scale-110"
                     />
 
-                  
                     {!quantities[product.id] && (
                       <button
-                        onClick={() => toggleCounter(product.id)}
-                        className="absolute bottom-0 right-2 bg-emerald-600 text-white rounded-full p-2 "
+                        onClick={(e) => toggleCounter(product.id, e)}
+                        className="absolute bottom-0 right-2 bg-emerald-600 text-white rounded-full p-2"
                       >
                         <Plus size={24} />
                       </button>
                     )}
 
-                   
                     {quantities[product.id] && (
                       <div className="absolute bottom-0.5 right-14 flex items-center bg-white shadow-lg rounded-md p-2">
-                        <button onClick={() => handleDecrement(product.id)} className="p-2 text-gray-700 hover:text-black hover:bg-gray-200 rounded-2xl">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDecrement(product.id);
+                          }} 
+                          className="p-2 text-gray-700 hover:text-black hover:bg-gray-200 rounded-2xl"
+                        >
                           <Minus size={20} />
                         </button>
                         <span className="mx-4 text-sm font-semibold">{quantities[product.id]}</span>
-                        <button onClick={() => handleIncrement(product.id)} className="p-2 text-gray-700 hover:text-black hover:bg-gray-200 rounded-2xl">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleIncrement(product.id);
+                          }} 
+                          className="p-2 text-gray-700 hover:text-black hover:bg-gray-200 rounded-2xl"
+                        >
                           <Plus size={20} />
                         </button>
                       </div>
                     )}
                   </div>
 
-               
                   <p className="text-gray-900 mt-2 text-lg font-semibold">₹{product.price}.00</p>
-                  <p className=" mt-4 text-md font-medium">{product.name}</p>
+                  <p className="mt-4 text-md font-medium">{product.name}</p>
                   <p className="text-gray-500 font-semibold mt-2 mb-4">1-PS</p>
                  
                   <button
-  onClick={() => toggleFavorite(product)}
-  className="mt-2 text-gray-500 hover:text-emerald-600"
->
-  <Heart
-    size={24}
-    fill={favorites.some((item) => item.id === product.id) ? "#02B290" : "none"}
-    stroke={favorites.some((item) => item.id === product.id) ? "#02B290" : "gray"}
-  />
-</button>
-
+                    onClick={(e) => toggleFavorite(product, e)}
+                    className="mt-2 text-gray-500 hover:text-emerald-600"
+                  >
+                    <Heart
+                      size={24}
+                      fill={favorites.some((item) => item.id === product.id) ? "#02B290" : "none"}
+                      stroke={favorites.some((item) => item.id === product.id) ? "#02B290" : "gray"}
+                    />
+                  </button>
                 </div>
               ))
             ) : (
@@ -179,6 +223,19 @@ const Searchproduct = () => {
           </div>
         </div>
       </div>
+
+      {/* Product Details Modal */}
+      <ProductDetails
+        product={selectedProduct}
+        isOpen={isDetailsOpen}
+        onClose={closeProductDetails}
+        onAddToCart={addToCart}
+        onToggleFavorite={(e) => selectedProduct && toggleFavorite(selectedProduct, e)}
+        quantity={selectedProduct ? quantities[selectedProduct.id] || 1 : 1}
+        onIncrement={() => selectedProduct && handleIncrement(selectedProduct.id)}
+        onDecrement={() => selectedProduct && handleDecrement(selectedProduct.id)}
+        isFavorite={selectedProduct ? favorites.some(item => item.id === selectedProduct.id) : false}
+      />
     </div>
   );
 };
