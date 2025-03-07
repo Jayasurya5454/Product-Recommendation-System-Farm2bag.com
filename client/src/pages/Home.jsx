@@ -8,6 +8,7 @@ import card3 from "../assets/cards/Juice2bag.jpg";
 import card4 from "../assets/cards/Seasonal.jpg";
 import { Link } from "react-router-dom";
 import CategoryList from "../components/CategoryList";
+import Footer from "../components/FooterComponent";
 
 const cardData = [
   {
@@ -75,6 +76,7 @@ const Home = () => {
         ))}
       </div>
       <CategoryList/>
+      <Footer/>
     </div>
   );
 };
