@@ -9,6 +9,7 @@ import card4 from "../assets/cards/Seasonal.jpg";
 import { Link } from "react-router-dom";
 import CategoryList from "../components/CategoryList";
 import Footer from "../components/FooterComponent";
+import FreshDaily from "../components/FreshDaily";
 
 const cardData = [
   {
@@ -76,6 +77,7 @@ const Home = () => {
         ))}
       </div>
       <CategoryList/>
+      <FreshDaily/>
       <Footer/>
     </div>
   );

@@ -20,16 +20,16 @@ const Footer = () => {
               preservative-free food straight from farm to your bag.
             </p>
             <div className="flex space-x-4">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-emerald-600">
+              <a href="https://www.facebook.com/farm2bag" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-emerald-600">
                 <Facebook size={20} />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-emerald-600">
+              <a href="https://x.com/farm2bag" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-emerald-600">
                 <Twitter size={20} />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-emerald-600">
+              <a href="https://www.instagram.com/farm2bag/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-emerald-600">
                 <Instagram size={20} />
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-emerald-600">
+              <a href="https://youtube.com/@farm2bag?si=1U_FvBs8rRMrm8wa" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-emerald-600">
                 <Youtube size={20} />
               </a>
             </div>
@@ -110,7 +110,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <div className="py-6 text-center border-t mt-8">
-          <p className="text-gray-600">© Copyright {new Date().getFullYear()} Farm2Bag. All rights reserved</p>
+          <p className="text-gray-800">© Copyright {new Date().getFullYear()} Farm2Bag. All rights reserved</p>
         </div>
       </div>
     </footer>
