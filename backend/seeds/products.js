@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 
-const assetsFolder = path.join(__dirname, "../../client/src/assets/products");
+const assetsFolder = path.join(__dirname, "../../client/src/assets/complipro");
 
 
 const uploadImages = async () => {
