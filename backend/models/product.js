@@ -42,7 +42,7 @@ const ProductSchema = new mongoose.Schema({
   },
   healthConditions: {
     type: [String],
-    enum: ['diabetes', 'hypertension', 'pregnancy', 'lactation', 'anemia', 'obesity', 'underweight', 'cholesterol', 'allergy', 'none'],
+    enum: ['diabetes', 'skin health','eye health','bone health','immunity','heart health','hypertension', 'digestion','pregnancy', 'lactation', 'anemia', 'obesity', 'underweight', 'cholesterol','blood health','hair health','blood pressure', 'hydration','allergy', 'none'],
     required: true,
   },
   seasonal: {
