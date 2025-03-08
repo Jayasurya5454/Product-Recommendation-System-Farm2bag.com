@@ -42,30 +42,31 @@ const ProductSchema = new mongoose.Schema({
   },
   healthConditions: {
     type: [String],
-    required: false,
+    enum: ['diabetes', 'hypertension', 'pregnancy', 'lactation', 'anemia', 'obesity', 'underweight', 'cholesterol', 'allergy', 'none'],
+    required: true,
   },
   seasonal: {
     type: [String],
-    enum: ["summer", "rainy", "winter", "spring", "autumn", "monsoon"], 
-    required: false,
+    enum: ["summer", "rainy", "winter", "spring", "autumn", "monsoon","all"], 
+    required: true,
   },
   skinTypeCompatibility: {
     type: String,
     enum : ['oily', 'dry', 'combination', 'normal'],
-    required: false,
+    required: true,
   },
   complementaryProducts: {
     type: [String],
-    required: false,
+    required: true,
   },
   occupationTags: {
     type: [String],
     enum : ['athlete', 'businessman', 'homemaker', 'teenager', 'child', 'employee', 'senior citizen'],
-    required: false,
+    required: true,
   },
   recipePairings: {
     type: [String],
-    required: false,
+    required: true,
   },
   discount: {
     type: Number,

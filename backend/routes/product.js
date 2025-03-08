@@ -9,3 +9,4 @@ router.post("/products", getProductById);
 router.post("/",  createProduct);
 
 module.exports = router;
+
