@@ -25,7 +25,11 @@ const ProductSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  photos: [String],
+  //photo is a url 
+ photos: {
+   type: String,
+   required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -41,11 +45,13 @@ const ProductSchema = new mongoose.Schema({
     required: false,
   },
   seasonal: {
-    type: Boolean,
+    type: [String],
+    enum: ["summer", "rainy", "winter", "spring", "autumn", "monsoon"], 
     required: false,
   },
   skinTypeCompatibility: {
     type: String,
+    enum : ['oily', 'dry', 'combination', 'normal'],
     required: false,
   },
   complementaryProducts: {
@@ -54,6 +60,7 @@ const ProductSchema = new mongoose.Schema({
   },
   occupationTags: {
     type: [String],
+    enum : ['athlete', 'businessman', 'homemaker', 'teenager', 'child', 'employee', 'senior citizen'],
     required: false,
   },
   recipePairings: {
