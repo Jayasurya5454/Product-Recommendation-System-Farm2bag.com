@@ -39,10 +39,10 @@ const SignInWithGoogle = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-    
+      console.log("User Data:", { userid: user.uid, email: user.email });
       await axiosInstance.post("/user", {
-        userId: user.uid,  
         email: user.email,
+        userid: user.uid,  
       });
 
       setModalVisible(false);

@@ -5,6 +5,8 @@ const User = require("../models/user"); // Import User model
 // Route to save user details
 router.post("/", async (req, res) => {
   const { userid, email } = req.body;
+  console.log("User ID:", userid);
+  console.log("Email:", email);
 
   try {
     // Check if user already exists

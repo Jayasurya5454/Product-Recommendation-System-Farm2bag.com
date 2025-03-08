@@ -108,11 +108,11 @@ const FreshDaily = ({ onAddToCart }) => {
           </p>
         </div>
         
-        <div className="flex justify-end mb-4">
+        {/* <div className="flex justify-end mb-4">
           <Link to="/products" className="text-emerald-600 hover:underline font-medium">
             View All
           </Link>
-        </div>
+        </div> */}
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {products.map((product) => (
