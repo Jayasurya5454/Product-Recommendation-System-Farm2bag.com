@@ -57,18 +57,7 @@ const UserSchema = new mongoose.Schema({
     enum: ["vegetarian", "vegan", "keto", "none"],
     default: "none",
   },
-  preferredSeasonalProducts: {
-    type: [String],
-    required: false,
-  },
-  purchaseHistory: [{
-    productId: String,
-    purchaseDate: Date,
-  }],
-  rewardPoints: {
-    type: Number,
-    default: 0,
-  },
+  
 });
 
 module.exports = mongoose.model('user', UserSchema);

@@ -5,7 +5,7 @@ import ProductDetails from "./ProductDetails"; // Import the ProductDetails comp
 
 // You would replace these with your actual imports
 import mushroom from "../assets/products/Musrom.webp";
-import orange from "../assets/products/orange.webp";
+import orange from "../assets/products/ORANGE.webp";
 import egg from "../assets/products/egg.webp";
 import redRice from "../assets/products/red-rice.webp";
 import banana from "../assets/products/banana.webp";

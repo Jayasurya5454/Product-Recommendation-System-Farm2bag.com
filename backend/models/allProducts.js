@@ -13,9 +13,7 @@ const AllProductSchema =new mongoose.Schema({
     required: true,
     default: 0,
   },
-  productId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true,
-  },
+
 });
+
+module.exports = mongoose.model('AllProduct', AllProductSchema);
