@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { axiosInstance } from "../utils/axios.js";
 import { User } from "lucide-react";
 import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase.js";
@@ -39,12 +40,9 @@ const SignInWithGoogle = () => {
       const user = result.user;
 
     
-      await fetch("http://localhost:5000/api/user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: user.email }),
+      await axiosInstance.post("/user", {
+        userId: user.uid,  
+        email: user.email,
       });
 
       setModalVisible(false);

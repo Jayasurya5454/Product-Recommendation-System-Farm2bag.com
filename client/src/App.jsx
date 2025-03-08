@@ -3,9 +3,10 @@ import Homepage from "../src/pages/Home";
 import Favorites from "./pages/FavoritesPage";
 import SearchProducts from "./pages/Searchproduct";
 import Products from "./pages/ProductsPage";
-
+import { AppProvider } from "./components/AppContext";
 function App() {
   return (
+    <AppProvider>
     <Router>
       <Routes>
       <Route path="/" element={<Homepage />} />
@@ -14,6 +15,7 @@ function App() {
         <Route path="/product/:id" element={<Products/>} />      
       </Routes>
     </Router>
+    </AppProvider>
   );
 }
 
