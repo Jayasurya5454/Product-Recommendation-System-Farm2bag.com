@@ -11,12 +11,13 @@ const EVENT_WEIGHTS = {
 // Track user events
 module.exports.trackEvent = async (req, res) => {
     try {
-        const { userId, productId, eventType } = req.body;
+        const { userId, productId, eventType,context,sessionId } = req.body;
+        console.log("Received event data:", { userId, productId, eventType, context, sessionId });
         const weight = EVENT_WEIGHTS[eventType];
         if (!weight) {
             return res.status(400).json({ message: 'Invalid event type' });
         }
-        const event = new Event({ userId, productId, eventType, weight });
+        const event = new Event({ userId, productId, eventType, weight,context,sessionId });
         let allproduct = await AllProduct.findOne({ productId });
         if (!allproduct) {
             allproduct = new AllProduct({ productId, weights: weight });
@@ -27,9 +28,10 @@ module.exports.trackEvent = async (req, res) => {
         await event.save();
         res.status(201).json({ message: 'Event tracked successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+      console.error("Error tracking event:", error);
+      res.status(500).json({ message: error.message });
     }
-};
+  };
 
 // Remove user events
 module.exports.removeEvent = async (req, res) => {
@@ -52,6 +54,7 @@ module.exports.removeEvent = async (req, res) => {
 };
 
 // Get user events
+
 module.exports.getEvents = async (req, res) => {
     try {
         const events = await Event.find().populate('userId').populate('productId');
