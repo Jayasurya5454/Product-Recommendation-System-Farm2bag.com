@@ -62,21 +62,41 @@ const deleteProduct = async (req, res) => {
     }
 }
 
+// const searchProduct = async (req, res) => {
+//     try {
+//         const { description } = req.query;
+//         const products = await Product.find({ description: { $regex: title, $options: "i" } });
+
+//         res.status(200).json(products);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// };
 const searchProduct = async (req, res) => {
     try {
         const { description } = req.query;
-        const products = await Product.find({ description: { $regex: title, $options: "i" } });
+
+        // Validate input
+        if (!description) {
+            return res.status(400).json({ message: "Description query is required" });
+        }
+
+        // Correct field name from "title"
+        const products = await Product.find({ 
+            title: { $regex: description, $options: "i" } // Ensure the correct field
+        });
 
         res.status(200).json(products);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error("Error in searchProduct:", error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
 
 const getProductById = async (req, res) => {
     try {
-        const productId = req.body.productId;
+        const productId = req.params.product_id;
         const product = await Product.findById(productId);
 
         if (!product) return res.status(404).json({ message: "Product not found" });

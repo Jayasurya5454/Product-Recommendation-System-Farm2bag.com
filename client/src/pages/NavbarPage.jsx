@@ -7,6 +7,7 @@ import SignInWithGoogle from "../components/SignInWithGoogle.jsx";
 import { useAppContext } from "../components/AppContext"; 
 import CartSidebar from "../components/CartSidebar";
 import FavoritesSidebar from "../components/FavoritesSidebar";
+import SearchBar from "../components/Searchbar.jsx";
 
 function Navbar() {
   const [user, setUser] = useState(null);
@@ -37,7 +38,7 @@ function Navbar() {
           </Link>
 
           {/* Search Bar */}
-          <div className="relative w-200 border border-gray-600 rounded-md">
+          {/* <div className="relative w-200 border border-gray-600 rounded-md">
             <input
               type="text"
               placeholder="What are you looking for..."
@@ -47,7 +48,8 @@ function Navbar() {
               size={20}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
             />
-          </div>
+          </div> */}
+          <SearchBar/>
 
           {/* Icons & Buttons */}
           <div className="flex items-center space-x-8">
