@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { axiosInstance } from "../utils/axios.js";
-import { useAppContext } from "../components/AppContext";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase.js";
 
@@ -23,8 +22,12 @@ const UserRegistrationForm = () => {
   const [errors, setErrors] = useState({});
 
   // Predefined options for dropdowns
-  const medicalConditionOptions = ["Diabetes", "Hypertension", "Heart Disease", "Asthma", "Thyroid", "Allergies", "Arthritis", "None"];
-  const skinTypeOptions = ["Normal", "Dry", "Oily", "Combination", "Sensitive"];
+  const medicalConditionOptions = [
+    'diabetes', 'skin health', 'eye health', 'bone health', 'immunity', 'heart health', 'hypertension', 'digestion', 'pregnancy', 'lactation', 'anemia', 'obesity', 'underweight', 'cholesterol', 'blood health', 'hair health', 'blood pressure', 'hydration', 'allergy', 'none'
+  ];
+
+  const skinTypeOptions = ['oily', 'dry', 'combination', 'normal'];
+
   const genderOptions = ["Male", "Female", "Other", "Prefer not to say"];
   const dietTypeOptions = [
     { value: "none", label: "None" },
@@ -32,30 +35,19 @@ const UserRegistrationForm = () => {
     { value: "vegan", label: "Vegan" },
     { value: "keto", label: "Keto" }
   ];
-  const occupationOptions = [
-    "Student", 
-    "Professional", 
-    "Business Owner", 
-    "Homemaker", 
-    "Retired", 
-    "Healthcare Worker", 
-    "Teacher/Educator", 
-    "IT Professional",
-    "Other"
-  ];
+  const occupationOptions = ['athlete', 'businessman', 'homemaker', 'teenager', 'child', 'employee', 'senior citizen'];
 
   // Check if user is authenticated and if they need to complete registration
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        
+
         // Check if user has completed registration
         try {
           const response = await axiosInstance.get(`/user/${currentUser.uid}`);
           const userData = response.data.user;
-          
-          // If mobileNumber is missing, user needs to complete registration
+
           if (!userData.mobileNumber) {
             setShowRegistration(true);
           } else {
@@ -74,7 +66,7 @@ const UserRegistrationForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    
+
     // Clear error for this field
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
@@ -84,49 +76,49 @@ const UserRegistrationForm = () => {
   const handleMedicalConditionsChange = (e) => {
     const value = e.target.value;
     const isChecked = e.target.checked;
-    
+
     setFormData(prevState => {
       // If "None" is selected, clear all other selections
-      if (value === "None" && isChecked) {
-        return { ...prevState, medicalConditions: ["None"] };
+      if (value === "none" && isChecked) {
+        return { ...prevState, medicalConditions: ["none"] };
       }
-      
+
       // If another option is selected while "None" is active, remove "None"
       let updatedConditions = [...prevState.medicalConditions];
       if (isChecked) {
-        if (updatedConditions.includes("None")) {
-          updatedConditions = updatedConditions.filter(item => item !== "None");
+        if (updatedConditions.includes("none")) {
+          updatedConditions = updatedConditions.filter(item => item !== "none");
         }
         updatedConditions.push(value);
       } else {
         updatedConditions = updatedConditions.filter(item => item !== value);
       }
-      
+
       return { ...prevState, medicalConditions: updatedConditions };
     });
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.mobileNumber) {
       newErrors.mobileNumber = "Mobile number is required";
     } else if (!/^\d{10}$/.test(formData.mobileNumber)) {
       newErrors.mobileNumber = "Please enter a valid 10-digit mobile number";
     }
-    
+
     if (formData.age && (isNaN(formData.age) || formData.age < 1 || formData.age > 120)) {
       newErrors.age = "Please enter a valid age between 1 and 120";
     }
-    
+
     if (formData.weight && (isNaN(formData.weight) || formData.weight < 1 || formData.weight > 500)) {
       newErrors.weight = "Please enter a valid weight (kg)";
     }
-    
+
     if (formData.height && (isNaN(formData.height) || formData.height < 50 || formData.height > 300)) {
       newErrors.height = "Please enter a valid height (cm)";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -143,17 +135,17 @@ const UserRegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // Calculate BMI if height and weight are provided
       const bmi = calculateBMI();
-      
+
       // Prepare the data to send
       const userData = {
         ...formData,
@@ -161,15 +153,15 @@ const UserRegistrationForm = () => {
         email: user.email,
         bmi: bmi || undefined
       };
-      
+
       // Convert string values to numbers where needed
       if (formData.age) userData.age = Number(formData.age);
       if (formData.weight) userData.weight = Number(formData.weight);
       if (formData.height) userData.height = Number(formData.height);
-      
+
       // Submit the data
       await axiosInstance.put(`/user/${user.uid}`, userData);
-      
+
       setRegistrationComplete(true);
       setShowRegistration(false);
     } catch (error) {

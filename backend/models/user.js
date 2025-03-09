@@ -45,11 +45,11 @@ const UserSchema = new mongoose.Schema({
     required: false,
   },
   skinType: {
-    type: String,
+    type: [String],
     required: false,
   },
   occupation: {
-    type: String,
+    type: [String],
     required: false,
   },
   dietType: {
