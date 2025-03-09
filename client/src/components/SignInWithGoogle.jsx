@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
 import { axiosInstance } from "../utils/axios.js";
 import { User } from "lucide-react";
-import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
+import { 
+  signInWithPopup, 
+  signInWithRedirect, 
+  getRedirectResult,
+  GoogleAuthProvider, 
+  onAuthStateChanged, 
+  signOut 
+} from "firebase/auth";
 import { auth } from "../../firebase.js";
 import { useAppContext } from "./AppContext"; // Make sure path is correct
 import logimg from "../assets/signup-banner.webp";
 import log2img from "../assets/signin-banner.webp";
-import RegisterForm from "./RegisterForm"; // Import the new component
 
 const SignInWithGoogle = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,6 +28,28 @@ const SignInWithGoogle = () => {
       setIsLoading(false);
     });
 
+    // Check for redirect result when component mounts
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result) {
+          const user = result.user;
+          console.log("User Data:", { userid: user.uid, email: user.email });
+          
+          await axiosInstance.post("/user", {
+            email: user.email,
+            userid: user.uid,  
+          });
+          
+          setModalVisible(false);
+          setTimeout(() => setIsOpen(false), 300);
+        }
+      })
+      .catch((error) => {
+        if (error.code !== "auth/redirect-cancelled-by-user") {
+          setError("Google Sign-In failed: " + error.message);
+        }
+      });
+
     return () => unsubscribe();
   }, []);
 
@@ -33,29 +61,53 @@ const SignInWithGoogle = () => {
     }
   }, [isOpen]);
 
-  const handleGoogleSignIn = async () => {
+  // Option 1: Using popup with a delay (less likely to be blocked)
+  const handleGoogleSignIn = () => {
     const provider = new GoogleAuthProvider();
     setError("");
     setIsLoading(true);
 
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+    // Small delay before opening popup
+    setTimeout(async () => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
 
-      console.log("User Data:", { userid: user.uid, email: user.email });
-      await axiosInstance.post("/user", {
-        email: user.email,
-        userid: user.uid,  
-      });
+        console.log("User Data:", { userid: user.uid, email: user.email });
+        await axiosInstance.post("/user", {
+          email: user.email,
+          userid: user.uid,  
+        });
 
-      setModalVisible(false);
-      setTimeout(() => setIsOpen(false), 300);
-    } catch (error) {
-      if (error.code === "auth/popup-closed-by-user") {
-        setError("Sign-in cancelled. Please try again when you're ready.");
-      } else {
-        setError("Google Sign-In failed: " + error.message);
+        setModalVisible(false);
+        setTimeout(() => setIsOpen(false), 300);
+        setIsLoading(false);
+      } catch (error) {
+        if (error.code === "auth/popup-closed-by-user") {
+          setError("Sign-in cancelled. Please try again when you're ready.");
+        } else if (error.code === "auth/popup-blocked") {
+          // If popup is blocked, fall back to redirect method
+          handleGoogleSignInRedirect();
+          return;
+        } else {
+          setError("Google Sign-In failed: " + error.message);
+        }
+        setIsLoading(false);
       }
+    }, 100);
+  };
+
+  // Option 2: Using redirect method as fallback (more reliable across browsers)
+  const handleGoogleSignInRedirect = () => {
+    const provider = new GoogleAuthProvider();
+    setError("");
+    setIsLoading(true);
+    
+    try {
+      signInWithRedirect(auth, provider);
+      // The result will be handled in the useEffect with getRedirectResult
+    } catch (error) {
+      setError("Google Sign-In failed: " + error.message);
       setIsLoading(false);
     }
   };
@@ -175,9 +227,6 @@ const SignInWithGoogle = () => {
           </div>
         </div>
       )}
-
-      {/* Registration Form Component */}
-      {/* <RegisterForm /> */}
     </div>
   );
 };
