@@ -1,33 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Minus, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
-import ProductDetails from "./ProductDetails"; // Import the ProductDetails component
-import { useAppContext } from "./AppContext"; // Import context for cart & favorites
-import { axiosInstance } from "../utils/axios"; // Axios instance for API calls
-import { auth } from "../../firebase"; // Firebase authentication
-import { v4 as uuidv4 } from "uuid"; // Unique session ID generator
-
-// You would replace these with your actual imports
-import mushroom from "../assets/products/Musrom.webp";
-import orange from "../assets/products/ORANGE.webp";
-import egg from "../assets/products/egg.webp";
-import redRice from "../assets/products/red-rice.webp";
-import banana from "../assets/products/banana.webp";
-import mango from "../assets/products/mango.webp";
-
-const products = [
-  { id: 1, name: "Mushroom/காளான்", price: 50.00, image: mushroom, unit: "1-PS" },
-  { id: 2, name: "Orange Peel Herbal Soap", price: 120.00, image: orange, unit: "1-PS" },
-  { id: 3, name: "Country Egg (naatu Koli Muttai)", price: 14.00, image: egg, unit: "1-PS" },
-  { id: 4, name: "Red Rice", price: 107.00, image: redRice, unit: "1-KG" },
-  { id: 5, name: "Hill Banana (malai Vaalai)", price: 150.00, image: banana, unit: "1-KG" },
-  { id: 6, name: "Vadu Mangai", price: 112.50, image: mango, unit: "250-G" }
-];
+import ProductDetails from "./ProductDetails";
+import { useAppContext } from "./AppContext";
+import { axiosInstance } from "../utils/axios";
+import { auth } from "../../firebase";
+import { v4 as uuidv4 } from "uuid";
 
 const FreshDaily = () => {
   // Use app context for cart and favorites
   const { addToCart, toggleFavorite, isProductFavorite } = useAppContext();
   
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [quantities, setQuantities] = useState({});
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -41,6 +27,39 @@ const FreshDaily = () => {
     });
 
     return () => unsubscribe();
+  }, []);
+
+  // Fetch products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get("/product");
+        // Transform backend data to match component needs
+        const formattedProducts = response.data.map(product => ({
+          id: product._id,
+          name: product.title,
+          price: product.price,
+          image: product.photos,
+          unit: `1-${product.category === 'Fruits' || product.category === 'Vegetables' ? 'KG' : 'PS'}`,
+          description: product.description,
+          category: product.category,
+          nutritionalInfo: product.nutritionalInfo,
+          healthConditions: product.healthConditions,
+          seasonal: product.seasonal,
+          discount: product.discount,
+          // Include other fields as needed
+        }));
+        setProducts(formattedProducts);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setError("Failed to load products. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   const getDeviceType = () => {
@@ -138,6 +157,28 @@ const FreshDaily = () => {
     setIsDetailsOpen(false);
   };
 
+  if (loading) {
+    return (
+      <div className="py-10 px-4 mt-4 mx-auto text-center">
+        <div className="container mx-auto">
+          <h2 className="text-2xl font-semibold">Fresh Daily</h2>
+          <p className="text-gray-600 mb-6 mt-4">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-10 px-4 mt-4 mx-auto text-center">
+        <div className="container mx-auto">
+          <h2 className="text-2xl font-semibold">Fresh Daily</h2>
+          <p className="text-red-500 mb-6 mt-4">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="py-10 px-4 mt-4 mx-auto text-center">
       <div className="container mx-auto">
@@ -148,67 +189,71 @@ const FreshDaily = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {products.map((product) => (
-            <div 
-              key={product.id}
-              className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white cursor-pointer"
-              onClick={() => openProductDetails(product)}
-            >
-              <div className="relative p-4">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-40 object-contain mx-auto transition-transform group-hover:scale-110"
-                />
-                
-                {!quantities[product.id] ? (
-                  <button
-                    onClick={(e) => toggleCounter(product, e)}
-                    className="absolute bottom-0 right-2 bg-emerald-600 text-white rounded-full p-2 "
-                  >
-                    <Plus size={24} />
-                  </button>
-                ) : (
-                  <div className="absolute bottom-0 right-12 flex items-center bg-white shadow-lg rounded-md p-2">
-                    <button 
-                      onClick={(e) => handleDecrement(product, e)} 
-                      className="p-2 text-gray-700 hover:text-black hover:bg-gray-200 rounded-full"
+        {products.length === 0 ? (
+          <p className="text-gray-500">No products available at the moment.</p>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {products.map((product) => (
+              <div 
+                key={product.id}
+                className="border relative group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white cursor-pointer"
+                onClick={() => openProductDetails(product)}
+              >
+                <div className="relative overflow-hidden p-4">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-40 mx-auto transition-transform group-hover:scale-110 object-cover rounded-lg"
+                  />
+                  
+                  {!quantities[product.id] ? (
+                    <button
+                      onClick={(e) => toggleCounter(product, e)}
+                      className="absolute bottom-0 right-2 bg-emerald-600 text-white rounded-full p-2 "
                     >
-                      <Minus size={20} />
+                      <Plus size={24} />
                     </button>
-                    <span className="mx-4 text-sm font-semibold">{quantities[product.id]}</span>
-                    <button 
-                      onClick={(e) => handleIncrement(product, e)} 
-                      className="p-2 text-gray-700 hover:text-black hover:bg-gray-200 rounded-full"
+                  ) : (
+                    <div className="absolute bottom-0 right-12 flex items-center bg-white shadow-lg rounded-md p-2">
+                      <button 
+                        onClick={(e) => handleDecrement(product, e)} 
+                        className="p-2 text-gray-700 hover:text-black hover:bg-gray-200 rounded-full"
+                      >
+                        <Minus size={20} />
+                      </button>
+                      <span className="mx-4 text-sm font-semibold">{quantities[product.id]}</span>
+                      <button 
+                        onClick={(e) => handleIncrement(product, e)} 
+                        className="p-2 text-gray-700 hover:text-black hover:bg-gray-200 rounded-full"
+                      >
+                        <Plus size={20} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="p-4 pt-0">
+                  <p className="font-bold text-lg text-emerald-600">₹{product.price.toFixed(2)}</p>
+                  <h3 className="mt-2 font-medium text-gray-900 truncate">{product.name}</h3>
+                  <p className="text-gray-500 text-sm">{product.unit}</p>
+                  
+                  <div className="mt-2 flex justify-between items-center">
+                    <button
+                      onClick={(e) => handleToggleFavorite(product, e)}
+                      className="text-gray-400 hover:text-emerald-600 transition-colors"
                     >
-                      <Plus size={20} />
+                      <Heart 
+                        size={20} 
+                        fill={isProductFavorite(product.id) ? "#02B290" : "none"}
+                        stroke={isProductFavorite(product.id) ? "#02B290" : "currentColor"}
+                      />
                     </button>
                   </div>
-                )}
-              </div>
-              
-              <div className="p-4 pt-0">
-                <p className="font-bold text-lg text-emerald-600">₹{product.price.toFixed(2)}</p>
-                <h3 className="mt-2 font-medium text-gray-900 truncate">{product.name}</h3>
-                <p className="text-gray-500 text-sm">{product.unit}</p>
-                
-                <div className="mt-2 flex justify-between items-center">
-                  <button
-                    onClick={(e) => handleToggleFavorite(product, e)}
-                    className="text-gray-400 hover:text-emerald-600 transition-colors"
-                  >
-                    <Heart 
-                      size={20} 
-                      fill={isProductFavorite(product.id) ? "#02B290" : "none"}
-                      stroke={isProductFavorite(product.id) ? "#02B290" : "currentColor"}
-                    />
-                  </button>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Product Details Modal */}

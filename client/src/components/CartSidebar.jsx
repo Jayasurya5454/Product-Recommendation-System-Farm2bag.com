@@ -162,14 +162,14 @@ const CartSidebar = ({ isOpen, onClose }) => {
                           onClick={() => handleQuantityChange(item.id, (item.quantity || 1) - 1)}
                           className="p-1 bg-gray-100 rounded-full"
                         >
-                          <Minus size={14} />
+                          <Minus size={20} />
                         </button>
                         <span className="px-2">{item.quantity || 1}</span>
                         <button
                           onClick={() => handleQuantityChange(item.id, (item.quantity || 1) + 1)}
                           className="p-1 bg-gray-100 rounded-full"
                         >
-                          <Plus size={14} />
+                          <Plus size={20} />
                         </button>
                       </div>
                     </div>
