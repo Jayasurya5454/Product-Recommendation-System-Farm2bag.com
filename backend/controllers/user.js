@@ -2,12 +2,10 @@ const User = require("../models/user");
 
 const createUser = async (req, res) => {
     const { userid, email } = req.body;
-    console.log("User ID:", userid);
-    console.log("Email:", email);
-    
+
     try {
         let user = await User.findOne({ userid });
-
+        console.log(user);
         if (!user) {
             user = new User({
                 userid,
@@ -15,7 +13,8 @@ const createUser = async (req, res) => {
                 lastVisit: new Date(),
             });
             await user.save();
-            console.log("New user created:", user);
+            console.log("New user created");
+
         } else {
             user.lastVisit = new Date();
             await user.save();
@@ -23,6 +22,7 @@ const createUser = async (req, res) => {
 
         res.status(200).json({ message: "User saved successfully", user });
     } catch (error) {
+        console.error("Error creating user:", error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -43,7 +43,6 @@ const updateUser = async (req, res) => {
             skinType,
         } = req.body;
 
-        // Find user by userid and update the fields
         const updatedUser = await User.findOneAndUpdate(
             { userid },
             {
@@ -64,7 +63,6 @@ const updateUser = async (req, res) => {
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found" });
         }
-        console.log("Updated user:", updatedUser );
 
         res.status(200).json({ message: "User details updated", user: updatedUser });
     } catch (error) {
@@ -76,9 +74,7 @@ const updateUser = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const userid = req.params.userid;
-        console.log("User ID:", userid);
         const user = await User.findOne({ userid });
-        console.log("User:", user);
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });

@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
   mobileNumber: {
     type: String,
     required: false,
-    unique: true,
+    
   },
   lastVisit: {
     type: Date,
