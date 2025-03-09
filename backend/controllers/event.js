@@ -12,12 +12,12 @@ const EVENT_WEIGHTS = {
 module.exports.trackEvent = async (req, res) => {
     try {
         const { userId, productId, eventType,context,sessionId } = req.body;
-        console.log("Received event data:", { userId, productId, eventType, context, sessionId });
+        console.log("Received event data:", { userId, productId, eventType, context });
         const weight = EVENT_WEIGHTS[eventType];
         if (!weight) {
             return res.status(400).json({ message: 'Invalid event type' });
         }
-        const event = new Event({ userId, productId, eventType, weight,context,sessionId });
+        const event = new Event({ userId, productId, eventType, weight,context });
         let allproduct = await AllProduct.findOne({ productId });
         if (!allproduct) {
             allproduct = new AllProduct({ productId, weights: weight });
