@@ -80,7 +80,6 @@ const SignInWithGoogle = () => {
     <div className="flex items-center justify-center min-h-screen">
       {user ? (
         <div className="flex items-center gap-4">
-          {/* <p>Welcome, {user.email}</p> */}
           <button
             onClick={handleLogout}
             disabled={isLoading}
