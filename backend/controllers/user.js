@@ -15,6 +15,7 @@ const createUser = async (req, res) => {
                 lastVisit: new Date(),
             });
             await user.save();
+            console.log("New user created:", user);
         } else {
             user.lastVisit = new Date();
             await user.save();
@@ -63,6 +64,7 @@ const updateUser = async (req, res) => {
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found" });
         }
+        console.log("Updated user:", updatedUser );
 
         res.status(200).json({ message: "User details updated", user: updatedUser });
     } catch (error) {
