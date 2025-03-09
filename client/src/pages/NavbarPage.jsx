@@ -3,9 +3,8 @@ import { ShoppingCart, Search, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import img from "../assets/Logo_with_text.webp";
 import { auth } from "../../firebase.js";
-import { signOut } from "firebase/auth";
 import SignInWithGoogle from "../components/SignInWithGoogle.jsx";
-import { useAppContext } from "../components/AppContext"; // Ensure path is correct
+import { useAppContext } from "../components/AppContext"; 
 import CartSidebar from "../components/CartSidebar";
 import FavoritesSidebar from "../components/FavoritesSidebar";
 
@@ -13,26 +12,10 @@ function Navbar() {
   const [user, setUser] = useState(null);
   const [isCartOpen, setCartOpen] = useState(false);
   const [isFavoritesOpen, setFavoritesOpen] = useState(false);
-  const navigate = useNavigate();
   
-  let cartCount = 0;
-  let favorites = [];
-  
-  try {
-    const appContext = useAppContext();
-    cartCount = appContext?.cart?.length || 0;
-    favorites = appContext?.favorites || [];
-  } catch (error) {
-    console.error("Context not available:", error);
-  }
-
-  const handleLogout = async () => {
-    if (window.confirm("Are you sure you want to log out?")) {
-      await signOut(auth);
-      setUser(null);
-      navigate("/");
-    }
-  };
+  // Use context properly
+  const { cartCount, favorites } = useAppContext();
+  const favoritesCount = favorites?.length || 0;
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -71,9 +54,9 @@ function Navbar() {
             {/* Favorites Icon */}
             <div className="relative cursor-pointer" onClick={() => setFavoritesOpen(true)}>
               <Heart size={24} className="text-gray-700 dark:text-black" />
-              {favorites.length > 0 && (
+              {favoritesCount > 0 && (
                 <span className="absolute -top-3 -right-3 bg-emerald-500 text-white text-sm px-2 rounded-full">
-                  {favorites.length}
+                  {favoritesCount}
                 </span>
               )}
             </div>
@@ -88,14 +71,8 @@ function Navbar() {
               )}
             </div>
 
-            {/* Authentication Button */}
-            {user ? (
-              <button onClick={handleLogout} className="cursor-pointer px-4 py-2 text-white bg-red-400 rounded-md hover:bg-red-600 transition-colors duration-300 flex items-center gap-2">
-                Logout
-              </button>
-            ) : (
-              <SignInWithGoogle />
-            )}
+            {/* Authentication Button - Using SignInWithGoogle component */}
+            <SignInWithGoogle />
           </div>
         </div>
       </nav>

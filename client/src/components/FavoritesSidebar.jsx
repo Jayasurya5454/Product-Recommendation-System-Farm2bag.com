@@ -1,15 +1,17 @@
 import React from "react";
-import { X, Heart } from "lucide-react";
+import { X, Heart, ShoppingBag } from "lucide-react";
 import { useAppContext } from "./AppContext"; // Adjust path as needed
 
 const FavoritesSidebar = ({ isOpen, onClose }) => {
   const { 
     favorites, 
-    toggleFavorite, 
-    //addToCart 
+    toggleFavorite,
+    moveToCart
   } = useAppContext();
 
- 
+  const handleMoveToCart = (item) => {
+    moveToCart(item);
+  };
 
   // If sidebar is closed, don't render anything
   if (!isOpen) return null;
@@ -67,6 +69,7 @@ const FavoritesSidebar = ({ isOpen, onClose }) => {
                         onClick={() => handleMoveToCart(item)}
                         className="mt-2 px-3 py-1 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
                       >
+                        <ShoppingBag size={14} className="inline mr-1" />
                         Add to cart
                       </button> */}
                     </div>
