@@ -50,7 +50,8 @@ const UserSchema = new mongoose.Schema({
   },
   occupation: {
     type: [String],
-    required: false,
+    enum: ['athlete', 'businessman', 'homemaker', 'teenager', 'child', 'employee', 'senior citizen'],
+    required: false, 
   },
   dietType: {
     type: String,
