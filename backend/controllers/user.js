@@ -1,4 +1,6 @@
 const User = require("../models/user");
+const Product = require("../models/product");
+
 
 const createUser = async (req, res) => {
     const { userid, email } = req.body;
@@ -64,6 +66,8 @@ const updateUser = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
+    
+
         res.status(200).json({ message: "User details updated", user: updatedUser });
     } catch (error) {
         console.error("Error updating user:", error);
@@ -86,6 +90,13 @@ const getUser = async (req, res) => {
         res.status(500).json({ message: "Failed to get user" });
     }
 };
+// const userChatbot = async (req, res) => {
+//     try {
+//         const userid = req.params.userid;
+//         const user = await User.findOne({ userid });
+//         /// send the user data and our prodect data to gemini pro with respect to the user data gemini poro need to send the which product to recomment to this user return the product id 
+//     }
+// };
 
 module.exports = {
     createUser,

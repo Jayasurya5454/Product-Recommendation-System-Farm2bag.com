@@ -1,17 +1,16 @@
 const Product = require("../models/product.js");
 const Event = require("../models/event.js");
 const AllProduct = require("../models/allProducts.js");
+const axios = require("axios");
+
 const createProduct = async (req, res) => {
     try {
-        
         const product = new Product(req.body);
-        
         await product.save();
 
-        // create a same da in all product also
+        // create a same data in all product also
         const allProduct = new AllProduct({ productId: product._id, weights: 0 });
         await allProduct.save();
-
 
         res.status(201).json({ message: "Product created successfully", product });
     } catch (error) {
@@ -25,6 +24,28 @@ const getList = async (req, res) => {
         res.status(200).json(products);
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+const recommendProducts = async (req, res) => {
+    try {
+        const userId = req.params.userId || req.body.userId;
+
+        if (!userId) {
+            return res.status(400).json({ error: "userId is required" });
+        }
+
+        const flaskAPIURL = `http://<FLASK_API_URL>/get_recommendations?userId=${userId}`;
+        const response = await axios.get(flaskAPIURL);
+
+        const recommendedProductIds = response.data;
+
+        const products = await getProductsByIds(recommendedProductIds);
+
+        return res.json({ recommendedProducts: products });
+    } catch (error) {
+        console.error("Error in recommending products:", error);
+        return res.status(500).json({ error: "An error occurred while fetching recommendations." });
     }
 };
 
@@ -47,43 +68,36 @@ const deleteProduct = async (req, res) => {
     try {
         const productId = req.params.productId;
         const product = await Product.findByIdAndDelete(productId);
-        const allproduct = await AllProduct.findOne({ productId });
-        if (allproduct) {
-            await AllProduct.findByIdAndDelete(allproduct._id);
+        const allProduct = await AllProduct.findOne({ productId });
+
+        if (allProduct) {
+            await AllProduct.findByIdAndDelete(allProduct._id);
         }
 
-
         if (!product) return res.status(404).json({ message: "Product not found" });
-        await Event.deleteMany({ productId }); // Remove associated events when a product is deleted from the database
+
+        await Event.deleteMany({ productId });
 
         res.status(200).json({ message: "Product deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
 
-// const searchProduct = async (req, res) => {
-//     try {
-//         const { description } = req.query;
-//         const products = await Product.find({ description: { $regex: title, $options: "i" } });
-
-//         res.status(200).json(products);
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// };
 const searchProduct = async (req, res) => {
     try {
         const { description } = req.query;
 
-        // Validate input
         if (!description) {
             return res.status(400).json({ message: "Description query is required" });
         }
 
-        // Correct field name from "title"
-        const products = await Product.find({ 
-            title: { $regex: description, $options: "i" } // Ensure the correct field
+        const products = await Product.find({
+            $or: [
+                { title: { $regex: description, $options: "i" } },
+                { description: { $regex: description, $options: "i" } },
+                { "nutritionalInfo.vitamins": { $regex: description, $options: "i" } }
+            ]
         });
 
         res.status(200).json(products);
@@ -92,7 +106,6 @@ const searchProduct = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
-
 
 const getProductById = async (req, res) => {
     try {
@@ -107,4 +120,4 @@ const getProductById = async (req, res) => {
     }
 };
 
-module.exports = { createProduct, getList, updateProduct, deleteProduct, searchProduct, getProductById };
+module.exports = { createProduct, getList, recommendProducts, updateProduct, deleteProduct, searchProduct, getProductById };
