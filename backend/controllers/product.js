@@ -81,10 +81,14 @@ const searchProduct = async (req, res) => {
             return res.status(400).json({ message: "Description query is required" });
         }
 
-        // Correct field name from "title"
-        const products = await Product.find({ 
-            title: { $regex: description, $options: "i" } // Ensure the correct field
+        const products = await Product.find({
+            $or: [
+                { title: { $regex: description, $options: "i" } },
+                { description: { $regex: description, $options: "i" } },
+                { "nutritionalInfo.vitamins": { $regex: description, $options: "i" } }
+            ]
         });
+        
 
         res.status(200).json(products);
     } catch (error) {
