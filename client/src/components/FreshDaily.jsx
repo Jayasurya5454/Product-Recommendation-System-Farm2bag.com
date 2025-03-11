@@ -3,7 +3,7 @@ import { Plus, Minus, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProductDetails from "./ProductDetails";
 import { useAppContext } from "./AppContext";
-import { axiosInstance } from "../utils/axios";
+import axios from "axios";
 import { auth } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
 
@@ -20,6 +20,9 @@ const FreshDaily = () => {
   const [userId, setUserId] = useState(null);
   const [sessionId] = useState(() => uuidv4());
 
+  // Get backend URL from environment variables
+  const backendUrl = import.meta.env.VITE_MODEL_BACKEND;
+
   // Get user ID on component mount
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -32,23 +35,30 @@ const FreshDaily = () => {
   // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
+      if (!userId) {
+        console.warn("User ID is null. Skipping product fetch.");
+        return;
+      }
+
       try {
         setLoading(true);
-        const response = await axiosInstance.get("/product");
+        console.log("Fetching products from:", backendUrl);
+
+        const response = await axios.get(`${backendUrl}/${userId}`);
+
         // Transform backend data to match component needs
-        const formattedProducts = response.data.map(product => ({
+        const formattedProducts = response.data.map((product) => ({
           id: product._id,
           name: product.title,
           price: product.price,
           image: product.photos,
-          unit: `1-${product.category === 'Fruits' || product.category === 'Vegetables' ? 'KG' : 'PS'}`,
+          unit: `1-${product.category === "Fruits" || product.category === "Vegetables" ? "KG" : "PS"}`,
           description: product.description,
           category: product.category,
           nutritionalInfo: product.nutritionalInfo,
           healthConditions: product.healthConditions,
           seasonal: product.seasonal,
           discount: product.discount,
-          // Include other fields as needed
         }));
         setProducts(formattedProducts);
       } catch (err) {
@@ -60,7 +70,9 @@ const FreshDaily = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [backendUrl, userId]);
+
+
 
   const getDeviceType = () => {
     const userAgent = navigator.userAgent;
