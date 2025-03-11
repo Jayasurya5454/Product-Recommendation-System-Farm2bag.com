@@ -27,27 +27,7 @@ const getList = async (req, res) => {
     }
 };
 
-const recommendProducts = async (req, res) => {
-    try {
-        const userId = req.params.userId || req.body.userId;
 
-        if (!userId) {
-            return res.status(400).json({ error: "userId is required" });
-        }
-
-        const flaskAPIURL = `http://<FLASK_API_URL>/get_recommendations?userId=${userId}`;
-        const response = await axios.get(flaskAPIURL);
-
-        const recommendedProductIds = response.data;
-
-        const products = await getProductsByIds(recommendedProductIds);
-
-        return res.json({ recommendedProducts: products });
-    } catch (error) {
-        console.error("Error in recommending products:", error);
-        return res.status(500).json({ error: "An error occurred while fetching recommendations." });
-    }
-};
 
 const updateProduct = async (req, res) => {
     try {
@@ -120,4 +100,4 @@ const getProductById = async (req, res) => {
     }
 };
 
-module.exports = { createProduct, getList, recommendProducts, updateProduct, deleteProduct, searchProduct, getProductById };
+module.exports = { createProduct, getList, updateProduct, deleteProduct, searchProduct, getProductById };
