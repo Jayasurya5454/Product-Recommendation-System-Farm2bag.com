@@ -120,14 +120,19 @@ def get_hybrid_recommendations(user_id, users, products, events, model, interact
     return hybrid_recs
 
 # Fetch product details
+from bson import ObjectId
+
 def get_product_details(product_ids):
+    product_ids = [ObjectId(pid) if isinstance(pid, str) else pid for pid in product_ids]
+    products_cursor = db.products.find({"_id": {"$in": product_ids}})
     products = []
-    for product_id in product_ids:
-        product = db.products.find_one({"_id": ObjectId(product_id)})
-        if product:
-            product["_id"] = str(product["_id"])
-            products.append(product)
-    return products
+    for product in products_cursor:
+        product["_id"] = str(product["_id"])
+        products.append(product)
+    unique_products = {product["_id"]: product for product in products}
+    
+    return list(unique_products.values())
+
 
 # Fetch overall recommendations
 from pymongo import MongoClient
