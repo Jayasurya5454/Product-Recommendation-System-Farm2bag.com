@@ -12,6 +12,7 @@ const RegisterForm = () => {
   const [profileComplete, setProfileComplete] = useState(false);
   const { currentUser } = useAppContext();
   const [formData, setFormData] = useState({
+    email: "",
     mobileNumber: "",
     age: "",
     gender: "",
@@ -45,6 +46,12 @@ const RegisterForm = () => {
       if (currentUser) {
         setUser(currentUser);
         
+        // Set email from Firebase auth
+        setFormData(prevData => ({
+          ...prevData,
+          email: currentUser.email || ""
+        }));
+        
         // Check if user has completed profile
         try {
           const response = await axiosInstance.get(`/user/${currentUser.uid}`);
@@ -53,6 +60,7 @@ const RegisterForm = () => {
           if (response.data) {
             const userData = response.data;
             setFormData({
+              email: currentUser.email || userData.email || "",
               mobileNumber: userData.mobileNumber || "",
               age: userData.age || "",
               gender: userData.gender || "",
@@ -128,6 +136,13 @@ const RegisterForm = () => {
   const validateForm = () => {
     const newErrors = {};
 
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
     // Make all fields required
     if (!formData.mobileNumber) {
       newErrors.mobileNumber = "Mobile number is required";
@@ -200,7 +215,6 @@ const RegisterForm = () => {
       const userData = {
         ...formData,
         userid: user.uid,
-        email: user.email,
         bmi: bmi || undefined
       };
 
@@ -266,6 +280,26 @@ const RegisterForm = () => {
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Email */}
+                <div className="col-span-2 md:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email address"
+                    className={`mt-1 block w-full rounded-md border ${
+                      errors.email ? 'border-red-500' : 'border-gray-300'
+                    } px-3 py-2 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500`}
+                  />
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                  )}
+                </div>
+                
                 {/* Mobile Number */}
                 <div className="col-span-2 md:col-span-1">
                   <label className="block text-sm font-medium text-gray-700">
