@@ -120,17 +120,44 @@ def get_hybrid_recommendations(user_id, users, products, events, model, interact
     return hybrid_recs
 
 # Fetch product details
+from bson import ObjectId
+
 def get_product_details(product_ids):
+    product_ids = [ObjectId(pid) if isinstance(pid, str) else pid for pid in product_ids]
+    products_cursor = db.products.find({"_id": {"$in": product_ids}})
     products = []
-    for product_id in product_ids:
-        product = db.products.find_one({"_id": ObjectId(product_id)})
-        if product:
-            product["_id"] = str(product["_id"])
-            products.append(product)
+    for product in products_cursor:
+        product["_id"] = str(product["_id"])
+        products.append(product)
+    unique_products = {product["_id"]: product for product in products}
+    
+    return list(unique_products.values())
+
+
+# Fetch overall recommendations
+from pymongo import MongoClient
+
+def get_overall_recommendations():
+    all_products = db.allproducts.find().sort("weights", -1)
+    
+    products = []
+
+    for product in all_products:
+        product_id = product.get("productId")
+        if product_id:
+            detailed_product = db.products.find_one({"_id": product_id})
+            if detailed_product:
+                detailed_product["_id"] = str(detailed_product["_id"])  
+                products.append(detailed_product)
+
     return products
+
 
 @app.route('/get_recommendations/<user_id>', methods=['GET'])
 def get_recommendations(user_id):
+    if not user_id:
+        fallback_recommendations = get_overall_recommendations()
+        return jsonify(fallback_recommendations)
     users, products, events = refresh_data()
     users = train_user_clusters(users)
     model = train_knn_model(events)
