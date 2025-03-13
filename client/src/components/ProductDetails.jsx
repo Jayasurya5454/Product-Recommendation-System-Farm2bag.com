@@ -149,3 +149,5 @@ const ProductDetails = ({ product, isOpen, onClose }) => {
 };
 
 export default ProductDetails;
+
+
