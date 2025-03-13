@@ -129,8 +129,30 @@ def get_product_details(product_ids):
             products.append(product)
     return products
 
+# Fetch overall recommendations
+from pymongo import MongoClient
+
+def get_overall_recommendations():
+    all_products = db.allproducts.find().sort("weights", -1)
+    
+    products = []
+
+    for product in all_products:
+        product_id = product.get("productId")
+        if product_id:
+            detailed_product = db.products.find_one({"_id": product_id})
+            if detailed_product:
+                detailed_product["_id"] = str(detailed_product["_id"])  
+                products.append(detailed_product)
+
+    return products
+
+
 @app.route('/get_recommendations/<user_id>', methods=['GET'])
 def get_recommendations(user_id):
+    if not user_id:
+        fallback_recommendations = get_overall_recommendations()
+        return jsonify(fallback_recommendations)
     users, products, events = refresh_data()
     users = train_user_clusters(users)
     model = train_knn_model(events)

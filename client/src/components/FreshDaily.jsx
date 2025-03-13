@@ -32,20 +32,15 @@ const FreshDaily = () => {
     return () => unsubscribe();
   }, []);
 
-  // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
-      if (!userId) {
-        console.warn("User ID is null. Skipping product fetch.");
-        return;
-      }
-
       try {
         setLoading(true);
         console.log("Fetching products from:", backendUrl);
-
-        const response = await axios.get(`${backendUrl}/${userId}`);
-
+  
+        // Use 'null' if userId is not yet available
+        const response = await axios.get(`${backendUrl}/${userId || "null"}`);
+  
         // Transform backend data to match component needs
         const formattedProducts = response.data.map((product) => ({
           id: product._id,
@@ -68,10 +63,21 @@ const FreshDaily = () => {
         setLoading(false);
       }
     };
-
-    fetchProducts();
+  
+    // Ensure fetchProducts is only called when `userId` is initialized
+    if (userId !== null) {
+      fetchProducts();
+    }
   }, [backendUrl, userId]);
-
+  
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUserId(user ? user.uid : "null"); // Default to "null" if no user is logged in
+    });
+  
+    return () => unsubscribe();
+  }, []);
+  
 
 
   const getDeviceType = () => {
