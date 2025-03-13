@@ -88,11 +88,11 @@ def get_product_pairing_recommendations(product_id, events, n=5):
 def get_seasonal_recommendations(products, n=5):
     current_month = datetime.now().month
     season_mapping = {
-        12: "winter", 1: "winter", 2: "winter",
-        3: "spring", 4: "spring", 5: "spring",
-        6: "summer", 7: "summer", 8: "summer",
-        9: "autumn", 10: "autumn", 11: "autumn"
-    }
+    3: "summer", 4: "summer", 5: "summer", 6: "summer",
+    7: "monsoon", 8: "monsoon", 9: "monsoon", 10: "monsoon", 11: "monsoon",
+    12: "winter", 1: "winter", 2: "winter"
+}
+
     current_season = season_mapping.get(current_month, "all")
     seasonal_products = products[products["seasonal"].apply(
         lambda x: current_season in x or "all" in x if isinstance(x, list) else x == current_season or x == "all"
