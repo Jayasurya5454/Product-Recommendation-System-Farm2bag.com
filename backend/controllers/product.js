@@ -18,24 +18,7 @@ const createProduct = async (req, res) => {
     }
 };
 
-const searchProductByName = async (req, res) => {
-    try {
-        const { query } = req.query;
 
-        if (!query) {
-            return res.status(400).json({ message: "Search query is required" });
-        }
-
-        const products = await Product.find({
-            title: { $regex: query, $options: "i" }
-        });
-
-        res.status(200).json(products);
-    } catch (error) {
-        console.error("Error in searchProductByName:", error);
-        res.status(500).json({ message: "Internal Server Error" });
-    }
-};
 
 const getList = async (req, res) => {
     try {
@@ -121,4 +104,4 @@ const getProductById = async (req, res) => {
     }
 };
 
-module.exports = { createProduct, getList, updateProduct, deleteProduct, searchProduct, getProductById,searchProductByName };
+module.exports = { createProduct, getList, updateProduct, deleteProduct, searchProduct, getProductById };
