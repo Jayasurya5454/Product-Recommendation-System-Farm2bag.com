@@ -103,23 +103,23 @@ const ProductDetails = ({ product, isOpen, onClose, isModal = true }) => {
     }
   };
 
-  const handleShareProduct = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: product.name,
-        text: `Check out this ${product.name}!`,
-        url: `${window.location.origin}/product/${product.id}`,
-      })
-      .then(() => sendEvent("share"))
-      .catch(error => console.log('Error sharing', error));
-    } else {
-      // Fallback for browsers that don't support navigator.share
-      const url = `${window.location.origin}/product/${product.id}`;
-      navigator.clipboard.writeText(url);
-      alert("Link copied to clipboard!");
-      sendEvent("copy_link");
-    }
-  };
+  // const handleShareProduct = () => {
+  //   if (navigator.share) {
+  //     navigator.share({
+  //       title: product.name,
+  //       text: `Check out this ${product.name}!`,
+  //       url: `${window.location.origin}/product/${product.id}`,
+  //     })
+  //     .then(() => sendEvent("share"))
+  //     .catch(error => console.log('Error sharing', error));
+  //   } else {
+  //     // Fallback for browsers that don't support navigator.share
+  //     const url = `${window.location.origin}/product/${product.id}`;
+  //     navigator.clipboard.writeText(url);
+  //     alert("Link copied to clipboard!");
+  //     sendEvent("copy_link");
+  //   }
+  // };
 
   // Render different layouts for modal vs. full page
   const renderContent = () => (
@@ -213,10 +213,10 @@ const ProductDetails = ({ product, isOpen, onClose, isModal = true }) => {
                    stroke={isProductFavorite(product.id) ? "#02B290" : "currentColor"} />
             </button>
             
-            <button onClick={handleShareProduct}
+            {/* <button onClick={handleShareProduct}
                   className="p-3 border border-gray-300 rounded-md hover:bg-gray-50">
               <Share2 size={20} />
-            </button>
+            </button> */}
           </div>
 
           {isModal && (
