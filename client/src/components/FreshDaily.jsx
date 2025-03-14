@@ -8,7 +8,6 @@ import { auth } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
 
 const FreshDaily = () => {
-  // Use app context for cart and favorites
   const { addToCart, toggleFavorite, isProductFavorite } = useAppContext();
   
   const [products, setProducts] = useState([]);
@@ -64,7 +63,6 @@ const FreshDaily = () => {
       }
     };
   
-    // Ensure fetchProducts is only called when `userId` is initialized
     if (userId !== null) {
       fetchProducts();
     }
@@ -72,7 +70,7 @@ const FreshDaily = () => {
   
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUserId(user ? user.uid : "null"); // Default to "null" if no user is logged in
+      setUserId(user ? user.uid : "null"); 
     });
   
     return () => unsubscribe();
