@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate,Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { ShoppingCart, Heart, ArrowLeft } from "lucide-react";
 import { useAppContext } from "../components/AppContext";
 import { axiosInstance } from "../utils/axios";
@@ -62,45 +62,45 @@ const ProductPage = () => {
   }, [id]);
 
  
-const fetchComplementaryProducts = async (productNames) => {
-  try {
+  const fetchComplementaryProducts = async (productNames) => {
+    try {
       const compProducts = [];
       
       // Fetch each complementary product individually by name
       for (const productName of productNames) {
-          try {
-              // Use the existing search endpoint with description parameter
-              const response = await axiosInstance.get('/product/search', {
-                  params: { description: productName }
-              });
-              
-              console.log(`Search results for ${productName}:`, response.data);
-              
-              // Find the exact match or closest match
-              const matchedProduct = response.data.find(
-                  product => product.title.toLowerCase() === productName.toLowerCase()
-              ) || response.data[0]; // Take first result if no exact match
-              
-              if (matchedProduct) {
-                  compProducts.push({
-                      ...matchedProduct,
-                      id: matchedProduct._id,
-                      name: matchedProduct.title,
-                      image: matchedProduct.photos
-                  });
-              }
-          } catch (error) {
-              console.error(`Error fetching complementary product ${productName}:`, error);
+        try {
+          // Use the existing search endpoint with description parameter
+          const response = await axiosInstance.get('/product/search', {
+            params: { description: productName }
+          });
+          
+          console.log(`Search results for ${productName}:`, response.data);
+          
+          // Find the exact match or closest match
+          const matchedProduct = response.data.find(
+            product => product.title.toLowerCase() === productName.toLowerCase()
+          ) || response.data[0]; // Take first result if no exact match
+          
+          if (matchedProduct) {
+            compProducts.push({
+              ...matchedProduct,
+              id: matchedProduct._id,
+              name: matchedProduct.title,
+              image: matchedProduct.photos
+            });
           }
+        } catch (error) {
+          console.error(`Error fetching complementary product ${productName}:`, error);
+        }
       }
       
       if (compProducts.length > 0) {
-          setComplementaryProducts(compProducts);
+        setComplementaryProducts(compProducts);
       }
-  } catch (err) {
+    } catch (err) {
       console.error("Error in fetchComplementaryProducts:", err);
-  }
-};
+    }
+  };
 
   // Send view event when product loads
   useEffect(() => {
@@ -156,10 +156,53 @@ const fetchComplementaryProducts = async (productNames) => {
     alert(`${quantity} ${product.name} added to cart!`);
   };
 
-  const handleToggleFavorite = () => {
-    if (!product) return;
+  const handleToggleFavorite = (productId, productObj = null) => {
+    if (!productId) return;
     
-    toggleFavorite(product);
+    // Determine product data source based on context
+    let productData;
+    
+    // If we're dealing with a product object that was passed in
+    if (productObj) {
+      productData = {
+        id: productId,
+        name: productObj.title || productObj.name, // Handle both title and name
+        price: productObj.price,
+        image: productObj.photos || productObj.image // Handle both photos and image
+      };
+    } 
+    // If it's the main product
+    else if (product && productId === product.id) {
+      productData = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image
+      };
+    } 
+    // If it's a complementary product
+    else {
+      const complementaryProduct = complementaryProducts.find(p => p.id === productId);
+      if (complementaryProduct) {
+        productData = {
+          id: complementaryProduct.id,
+          name: complementaryProduct.name,
+          price: complementaryProduct.price,
+          image: complementaryProduct.image
+        };
+      } else {
+        // If we can't find the product but we're trying to remove it (it's already a favorite)
+        if (isProductFavorite(productId)) {
+          // Just pass the ID for removal
+          productData = { id: productId };
+        } else {
+          console.error("Cannot add product to favorites: insufficient data");
+          return;
+        }
+      }
+    }
+    
+    toggleFavorite(productData);
     sendEvent("favourite");
   };
 
@@ -176,16 +219,16 @@ const fetchComplementaryProducts = async (productNames) => {
     addToCart(complementaryProduct, 1);
     alert(`${complementaryProduct.name} added to cart!`);
     
-    // Track the event
+    // Track the event using the standard "add_to_cart" event type
     if (userId && complementaryProduct) {
       const eventData = {
         userId,
         productId: complementaryProduct.id,
-        eventType: "add_complementary_to_cart",
-        referringProductId: product.id,
+        eventType: "add_to_cart",
         context: {
           device: getDeviceType(),
-          timeOfDay: getTimeOfDay()
+          timeOfDay: getTimeOfDay(),
+          referringProductId: product.id // Still track the referring product in context
         },
         sessionId
       };
@@ -336,7 +379,7 @@ const fetchComplementaryProducts = async (productNames) => {
                 </button>
 
                 <button 
-                  onClick={handleToggleFavorite}
+                  onClick={() => handleToggleFavorite(product.id, product)}
                   className="p-3 border border-gray-300 rounded-md hover:bg-gray-50"
                 >
                   <Heart 
@@ -352,55 +395,75 @@ const fetchComplementaryProducts = async (productNames) => {
 
         {/* Complementary Products Section */}
         {product.complementaryProducts && product.complementaryProducts.length > 0 && (
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8 p-6">
-            <h3 className="text-xl font-bold mb-4">Frequently Bought Together</h3>
-            
-            {complementaryProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {complementaryProducts.map((complementaryProduct) => (
-                  <div 
-                    key={complementaryProduct.id} 
-                    className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => handleNavigateToProduct(complementaryProduct.id)}
-                  >
-                    <div className="h-40 bg-gray-50 flex items-center justify-center p-4">
-                      <img 
-                        src={complementaryProduct.image || "https://via.placeholder.com/150x150?text=No+Image"} 
-                        alt={complementaryProduct.name} 
-                        className="h-full object-contain"
-                      />
+          <div className="bg-white rounded-md shadow-sm overflow-hidden mb-8 mx-auto w-full max-w-7xl">
+            <div className="p-6">
+              <h3 className="text-xl font-bold mb-4">Frequently Bought Together</h3>
+              
+              {complementaryProducts.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {complementaryProducts.map((complementaryProduct) => (
+                    <div
+                      key={complementaryProduct.id}
+                      className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => handleNavigateToProduct(complementaryProduct.id)}
+                    >
+                      <div className="h-40 bg-gray-50 flex items-center justify-center p-4">
+                        <img
+                          src={complementaryProduct.image || "https://via.placeholder.com/150x150?text=No+Image"}
+                          alt={complementaryProduct.name}
+                          className="h-full object-contain"
+                        />
+                      </div>
+                      <div className="p-4">
+                        <h4 className="font-medium text-sm mb-1 truncate">{complementaryProduct.name}</h4>
+                        <p className="text-emerald-600 font-bold mb-2">₹{complementaryProduct.price?.toFixed(2)}</p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddComplementaryToCart(e, complementaryProduct);
+                            }}
+                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-md font-medium flex items-center justify-center"
+                          >
+                            <ShoppingCart size={18} className="mr-2" />
+                            Add to Cart
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleFavorite(complementaryProduct.id, complementaryProduct);
+                            }}
+                            className="p-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                          >
+                            <Heart
+                              size={18}
+                              fill={isProductFavorite(complementaryProduct.id) ? "#02B290" : "none"}
+                              stroke={isProductFavorite(complementaryProduct.id) ? "#02B290" : "currentColor"}
+                            />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="p-4">
-                      <h4 className="font-medium text-sm mb-1 truncate">{complementaryProduct.name}</h4>
-                      <p className="text-emerald-600 font-bold mb-2">₹{complementaryProduct.price?.toFixed(2)}</p>
-                      <button
-                        onClick={(e) => handleAddComplementaryToCart(e, complementaryProduct)}
-                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-25 rounded-md font-medium flex items-center justify-center"
-                      >
-                        <ShoppingCart size={20} className="mr-2" />
-                        Add to Cart
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-4 text-gray-500">
-                <p>Loading complementary products...</p>
-              </div>
-            )}
-            
-            {/* Fallback display of complementary product names if products can't be fetched */}
-            {complementaryProducts.length === 0 && product.complementaryProducts.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                <p className="text-gray-600 mr-2">Pairs well with:</p>
-                {product.complementaryProducts.map((productName) => (
-                  <span key={productName} className="bg-emerald-50 text-emerald-600 px-2 py-1 rounded text-sm">
-                    {productName}
-                  </span>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-4 text-gray-500">
+                  <p>Loading complementary products...</p>
+                </div>
+              )}
+              
+              {/* Fallback display of complementary product names if products can't be fetched */}
+              {complementaryProducts.length === 0 && product.complementaryProducts.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <p className="text-gray-600 mr-2">Pairs well with:</p>
+                  {product.complementaryProducts.map((productName) => (
+                    <span key={productName} className="bg-emerald-50 text-emerald-600 px-2 py-1 rounded text-sm">
+                      {productName}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
