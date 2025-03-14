@@ -289,7 +289,7 @@ const RegisterForm = () => {
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleChange}
+                    // onChange={handleChange}
                     placeholder="Enter your email address"
                     className={`mt-1 block w-full rounded-md border ${
                       errors.email ? 'border-red-500' : 'border-gray-300'
