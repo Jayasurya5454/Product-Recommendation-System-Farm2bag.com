@@ -6,6 +6,7 @@ import { useAppContext } from "./AppContext";
 import axios from "axios";
 import { auth } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
+import { axiosInstance } from "../utils/axios";
 
 const FreshDaily = () => {
   const { addToCart, toggleFavorite, isProductFavorite } = useAppContext();
