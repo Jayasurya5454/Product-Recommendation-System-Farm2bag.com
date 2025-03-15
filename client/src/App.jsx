@@ -4,6 +4,7 @@ import Favorites from "./pages/FavoritesPage";
 import SearchProducts from "./pages/Searchproduct";
 import Products from "./pages/ProductsPage";
 import { AppProvider } from "./components/AppContext";
+import Chatbot from "./components/Chatbot";
 function App() {
   return (
     <AppProvider>
@@ -14,7 +15,9 @@ function App() {
         <Route path="/wishlist" element={<Favorites/>}/>  
         <Route path="/product/:id" element={<Products/>} />      
       </Routes>
+      
     </Router>
+    
     </AppProvider>
   );
 }
