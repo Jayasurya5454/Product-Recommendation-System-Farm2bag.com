@@ -5,6 +5,12 @@
 The **Farm2Bag Recommendation System** is a comprehensive project designed to provide personalized product recommendations for users based on various factors like collaborative filtering, demographic data, health conditions, seasons, and profession. The system integrates data from MongoDB, processes it in real-time, and offers dynamic recommendations through a Flask API.
 
 ---
+> **Achievement**: This project was instrumental in winning a cash prize of ₹10,000 at the AI Conclave National Level Hackathon.
+
+---
+## Our Achievements Snaps
+
+![Screenshot](Achievements%20AI%20Conclave.jpg)
 
 ## Features
 
