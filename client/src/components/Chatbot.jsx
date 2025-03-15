@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { axiosInstance } from "../utils/axios";
+import axios from "axios"
 
 const Chatbot = () => {
   const [products, setProducts] = useState([]);
@@ -13,6 +14,7 @@ const Chatbot = () => {
 
   const backendUrl = import.meta.env.VITE_MODEL_BACKEND;
   // Fetch products when the chatbot is opened
+  
   useEffect(() => {
     if (isOpen) {
       fetchProducts();
@@ -30,7 +32,7 @@ const Chatbot = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axiosInstance.get(`${backendUrl}/${userId || "null"}`);
+      const response = await axios.get(`${backendUrl}/${userId || "null"}`);
       
       // Transform the product data to match the expected structure
       const transformedProducts = response.data.map(product => ({
