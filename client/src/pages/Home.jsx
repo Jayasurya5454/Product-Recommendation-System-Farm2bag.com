@@ -10,7 +10,6 @@ import { Link } from "react-router-dom";
 import CategoryList from "../components/CategoryList";
 import Footer from "../components/FooterComponent";
 import FreshDaily from "../components/FreshDaily";
-import Chatbot from "../components/Chatbot";
 
 const cardData = [
   {
@@ -80,7 +79,6 @@ const Home = () => {
       <CategoryList/>
       <FreshDaily/>
       <Footer/>
-      <Chatbot/>
     </div>
   );
 };

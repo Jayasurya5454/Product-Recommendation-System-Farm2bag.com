@@ -6,9 +6,9 @@ import { useAppContext } from "./AppContext";
 import axios from "axios";
 import { auth } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
-import { axiosInstance } from "../utils/axios";
 
 const FreshDaily = () => {
+  // Use app context for cart and favorites
   const { addToCart, toggleFavorite, isProductFavorite } = useAppContext();
   
   const [products, setProducts] = useState([]);
@@ -32,15 +32,20 @@ const FreshDaily = () => {
     return () => unsubscribe();
   }, []);
 
+  // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
+      if (!userId) {
+        console.warn("User ID is null. Skipping product fetch.");
+        return;
+      }
+
       try {
         setLoading(true);
         console.log("Fetching products from:", backendUrl);
-  
-        // Use 'null' if userId is not yet available
-        const response = await axios.get(`${backendUrl}/${userId || "null"}`);
-  
+
+        const response = await axios.get(`${backendUrl}/${userId}`);
+
         // Transform backend data to match component needs
         const formattedProducts = response.data.map((product) => ({
           id: product._id,
@@ -63,20 +68,10 @@ const FreshDaily = () => {
         setLoading(false);
       }
     };
-  
-    if (userId !== null) {
-      fetchProducts();
-    }
+
+    fetchProducts();
   }, [backendUrl, userId]);
-  
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUserId(user ? user.uid : "null"); 
-    });
-  
-    return () => unsubscribe();
-  }, []);
-  
+
 
 
   const getDeviceType = () => {

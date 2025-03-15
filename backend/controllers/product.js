@@ -18,8 +18,6 @@ const createProduct = async (req, res) => {
     }
 };
 
-
-
 const getList = async (req, res) => {
     try {
         const products = await Product.find();
@@ -28,7 +26,6 @@ const getList = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
 
 
 
@@ -89,7 +86,6 @@ const searchProduct = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
-
 
 const getProductById = async (req, res) => {
     try {
